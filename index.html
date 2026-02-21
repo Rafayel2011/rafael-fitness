@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Fitness Coach</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.app {
+  background: white;
+  width: 100%;
+  max-width: 420px;
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+h1 {
+  text-align: center;
+  margin-top: 0;
+}
+
+.subtitle {
+  text-align: center;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+label {
+  font-weight: bold;
+  display: block;
+  margin-top: 10px;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin-top: 5px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 15px;
+  border-radius: 12px;
+  border: none;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.save {
+  background: #4facfe;
+  color: white;
+}
+
+.ai {
+  background: #43e97b;
+  color: #1b4332;
+}
+
+.progress {
+  text-align: center;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.ai-box {
+  background: #f1fff6;
+  border-radius: 12px;
+  padding: 10px;
+  margin-top: 8px;
+  min-height: 40px;
+}
+
+.motivation {
+  text-align: center;
+  margin-top: 8px;
+  font-size: 14px;
+  color: #444;
+}
+
+ul {
+  padding-left: 18px;
+  max-height: 140px;
+  overflow-y: auto;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+  <h1>🤖 AI Fitness Coach</h1>
+  <div class="subtitle">30-Day Workout Tracker</div>
+
+  <label>Weight (kg)</label>
+  <input id="weight" type="number" placeholder="e.g. 70">
+
+  <label>Today's workout</label>
+  <input id="exercise" type="text" placeholder="e.g. Squats, Push-ups">
+
+  <button class="save" onclick="saveDay()">Save Day</button>
+
+  <div class="progress" id="progress"></div>
+
+  <button class="ai" onclick="aiCoach()">Get AI Workout</button>
+  <div class="ai-box" id="ai"></div>
+  <div class="motivation" id="motivation"></div>
+
+  <h3>📅 History</h3>
+  <ul id="history"></ul>
+</div>
+
+<script>
+let data = JSON.parse(localStorage.getItem("fitnessAI")) || [];
+
+function saveDay() {
+  const weight = document.getElementById("weight").value;
+  const exercise = document.getElementById("exercise").value;
+
+  if (weight === "" || exercise === "") {
+    alert("Please fill in all fields");
+    return;
+  }
+
+  data.push({
+    date: new Date().toLocaleDateString(),
+    weight: weight,
+    exercise: exercise
+  });
+
+  localStorage.setItem("fitnessAI", JSON.stringify(data));
+  showData();
+}
+
+function aiCoach() {
+  const days = data.length;
+  const weight = document.getElementById("weight").value || 70;
+  let text = "";
+
+  if (days < 5) {
+    text = "Beginner: 10 squats, 5 push-ups, 20 sec plank";
+  } else if (days < 15) {
+    text = "Intermediate: 15 squats, 10 push-ups, 30 sec plank";
+  } else {
+    text = "Advanced: 20 squats, 15 push-ups, 45 sec plank";
+  }
+
+  if (weight > 90) {
+    text += " (low impact)";
+  }
+
+  document.getElementById("ai").innerText = text;
+  document.getElementById("motivation").innerText = randomMotivation();
+}
+
+function randomMotivation() {
+  const msgs = [
+    "Consistency beats motivation 💪",
+    "Small steps every day 🔥",
+    "Progress, not perfection",
+    "Your future self will thank you",
+    "Day by day you get stronger"
+  ];
+  return msgs[Math.floor(Math.random() * msgs.length)];
+}
+
+function showData() {
+  const history = document.getElementById("history");
+  history.innerHTML = "";
+
+  data.forEach(d => {
+    const li = document.createElement("li");
+    li.innerText = `${d.date} • ${d.weight}kg • ${d.exercise}`;
+    history.appendChild(li);
+  });
+
+  document.getElementById("progress").innerText =
+    `📊 Progress: Day ${data.length} / 30`;
+}
+
+showData();
+</script>
+
+</body>
+</html>
